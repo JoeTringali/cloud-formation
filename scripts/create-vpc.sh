@@ -4,6 +4,7 @@ script_name=$0
 
 aws_cmd=${aws_cmd:-aws}
 
+region=$($aws_cmd configure get region)
 stack_name=""
 cidr_block="10.0.0.0/16"
 enable_dns_hostnames="false"
@@ -11,17 +12,20 @@ enable_dns_support="true"
 instance_tenancy="default"
 name_tag=""
 
-s="usage: $script_name"
+s="Usage: $script_name"
 s+="  --stack-name <The stack name>"
 s+=" [ --cidr_block <The primary IPv4 CIDR block>"
 s+=" --enable_dns_hostnames <true or false>"
 s+=" --enable_dns_support <true or false>"
 s+=" --instance_tenancy <dedicated, default or host"
 s+=" --name_tag <value of 'Name' tag>"
+s+=" --region <The region for the stack>"
 s+=" --help ]"
 
 display_usage() {
     echo $s
+    echo ""
+    echo "where"
     echo ""
     echo "  --help                  Display help."
     echo "  --stack-name            The name that is associated with the stack. The name must be unique in the region in which you are creating the stack."
@@ -30,6 +34,7 @@ display_usage() {
     echo "  --enable_dns_support    Indicates whether the DNS resolution is supported for the VPC."
     echo "  --instance_tenancy      The allowed tenancy of instances launched into the VPC."
     echo "  --name_tag              A tag with a key of 'Name' and a value that you specify."
+    echo "  --region                <The region for the stack>"
     echo ""
 }
 
@@ -55,6 +60,9 @@ while (( "$#" )); do
     elif [[ (( $1 == "--name_tag") || $1 == "-n") && $# -ge 2 ]]; then
         shift
         name_tag=$1
+    elif [[ (( $1 == "--region") || $1 == "-r") && $# -ge 2 ]]; then
+        shift
+        region=$1
     else
         display_usage
         exit 1
@@ -67,7 +75,9 @@ if [[ (-z $stack_name) ]]; then
     exit 1
 fi
 
-$aws_cmd cloudformation create-stack --stack-name $stack_name \
+$aws_cmd cloudformation create-stack \
+        --region $region \
+        --stack-name $stack_name \
         --template-body file://../templates/vpc.yaml \
         --parameters \
             ParameterKey=pCidrBlock,ParameterValue=$cidr_block \
