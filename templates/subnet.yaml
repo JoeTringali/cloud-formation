@@ -46,7 +46,6 @@ Parameters:
   pCidrBlock:
     Type: String
     AllowedPattern: '((\d{1,3})\.){3}\d{1,3}/\d{1,2}'
-    Default: 10.0.0.0/16
     Description: The IPv4 CIDR block assigned to the subnet.
   pIpv6CidrBlock:
     Type: String

@@ -34,7 +34,7 @@ display_usage() {
     echo "  --enable-dns-support    Indicates whether the DNS resolution is supported for the VPC."
     echo "  --instance-tenancy      The allowed tenancy of instances launched into the VPC."
     echo "  --name-tag              A tag with a key of 'Name' and a value that you specify."
-    echo "  --region                <The region for the stack>"
+    echo "  --region                The region for the stack."
     echo ""
 }
 
