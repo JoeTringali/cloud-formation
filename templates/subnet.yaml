@@ -65,7 +65,7 @@ Resources:
           - HasNameTag
           - Key: "Name"
             Value: !Ref NameTag
-          - !Ref AWS::NoValue
+          - []
       VpcId: !Ref VpcId
 Outputs:
   SubnetId:
