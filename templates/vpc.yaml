@@ -9,29 +9,31 @@ Metadata:
       - Label:
           default: VPC Configuration
         Parameters:
-          - pCidrBlock
-          - pEnableDnsHostnames
-          - pEnableDnsSupport
-          - pInstanceTenancy
-          - pNameTag
+          - CidrBlock
+          - EnableDnsHostnames
+          - EnableDnsSupport
+          - InstanceTenancy
+          - NameTag
     ParameterLabels:
-      pCidrBlock:
+      CidrBlock:
         default: IPv4 CIDR Block
-      pEnableDnsHostnames:
+      EnableDnsHostnames:
         default: Enable DNS Hostnames
-      pEnableDnsSupport:
+      EnableDnsSupport:
         default: Enable DNS Support
-      pInstanceTenancy:
+      InstanceTenancy:
         default: Instance Tenancy
-      pNameTag:
+      NameTag:
         default: Name Tag
+Conditions:
+  HasNameTag:  !Not [ !Equals [ !Ref NameTag, "" ] ]
 Parameters:
-  pCidrBlock:
+  CidrBlock:
     Type: String
     AllowedPattern: '((\d{1,3})\.){3}\d{1,3}/\d{1,2}'
     Default: 10.0.0.0/16
     Description: The primary IPv4 CIDR block for the VPC.
-  pEnableDnsHostnames:
+  EnableDnsHostnames:
     Type: String
     AllowedValues:
       - false
@@ -40,7 +42,7 @@ Parameters:
     Description: >
       Indicates whether the instances launched in the VPC get DNS 
       hostnames.
-  pEnableDnsSupport:
+  EnableDnsSupport:
     Type: String
     AllowedValues:
       - false
@@ -48,7 +50,7 @@ Parameters:
     Default: true
     Description: >
       Indicates whether the DNS resolution is supported for the VPC.
-  pInstanceTenancy:
+  InstanceTenancy:
     Type: String
     AllowedValues:
       - dedicated
@@ -57,7 +59,7 @@ Parameters:
     Description: >
       The allowed tenancy of instances launched into the VPC.
     Default: default
-  pNameTag:
+  NameTag:
     Type: String
     Description: >
       A tag with a key of 'Name' and a value that you specify.
@@ -65,13 +67,16 @@ Resources:
   VPC:
     Type: AWS::EC2::VPC
     Properties: 
-      CidrBlock: !Ref pCidrBlock
-      EnableDnsHostnames: !Ref pEnableDnsHostnames
-      EnableDnsSupport: !Ref pEnableDnsSupport
-      InstanceTenancy: !Ref pInstanceTenancy
+      CidrBlock: !Ref CidrBlock
+      EnableDnsHostnames: !Ref EnableDnsHostnames
+      EnableDnsSupport: !Ref EnableDnsSupport
+      InstanceTenancy: !Ref InstanceTenancy
       Tags: 
-        - Key: "Name"
-          Value: !Ref pNameTag
+        !If 
+          - HasNameTag
+          - Key: "Name"
+            Value: !Ref NameTag
+          - !Ref AWS::NoValue
 Outputs:
   VpcId:
     Value: !Ref VPC
