@@ -76,7 +76,7 @@ Resources:
           - HasNameTag
           - Key: "Name"
             Value: !Ref NameTag
-          - !Ref AWS::NoValue
+          - []
 Outputs:
   VpcId:
     Value: !Ref VPC
