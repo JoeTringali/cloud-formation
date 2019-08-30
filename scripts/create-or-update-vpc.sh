@@ -13,7 +13,7 @@ instance_tenancy="default"
 name_tag=""
 
 s="Usage: $script_name"
-s+="  --stack-name <The stack name>"
+s+=" --stack-name <The stack name>"
 s+=" [ --cidr-block <The primary IPv4 CIDR block>"
 s+=" --enable-dns-hostnames <true or false>"
 s+=" --enable-dns-support <true or false>"
@@ -86,8 +86,8 @@ $aws_cmd cloudformation ${create_or_update}-stack \
         --stack-name $stack_name \
         --template-body file://../templates/vpc.yaml \
         --parameters \
-            ParameterKey=pCidrBlock,ParameterValue=$cidr_block \
-            ParameterKey=pEnableDnsHostnames,ParameterValue=$enable_dns_hostnames \
-            ParameterKey=pEnableDnsSupport,ParameterValue=$enable_dns_support \
-            ParameterKey=pInstanceTenancy,ParameterValue=$instance_tenancy \
-            ParameterKey=pNameTag,ParameterValue=$name_tag
+            ParameterKey=CidrBlock,ParameterValue=$cidr_block \
+            ParameterKey=EnableDnsHostnames,ParameterValue=$enable_dns_hostnames \
+            ParameterKey=EnableDnsSupport,ParameterValue=$enable_dns_support \
+            ParameterKey=InstanceTenancy,ParameterValue=$instance_tenancy \
+            ParameterKey=NameTag,ParameterValue=$name_tag
