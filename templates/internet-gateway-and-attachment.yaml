@@ -1,6 +1,24 @@
 AWSTemplateFormatVersion: 2010-09-09
 Description: >
   This template allocates an internet gateway for use with a VPC.
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: Internet Gateway Configuration
+        Parameters:
+          - VpcId
+    ParameterLabels:
+      VpcId:
+        default: VPC ID
+Parameters:
+  VpcId:
+    Type: AWS::EC2::VPC::Id
+    ConstraintDescription: >
+      VPC ID is required.
+    Description: >
+      The ID of the VPC the internet gateway will be attached to.
+    MinLength: 1
 Resources:
   InternetGateway:
     Type: AWS::EC2::InternetGateway
@@ -8,6 +26,11 @@ Resources:
       Tags: 
         - Key: "Name"
           Value: !Ref AWS::StackName
+  VPCGatewayAttachment:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      InternetGatewayId: !Ref InternetGateway
+      VpcId: !Ref VpcId
 Outputs:
-  SubnetId:
+  InternetGatewayId:
     Value: !Ref InternetGateway
