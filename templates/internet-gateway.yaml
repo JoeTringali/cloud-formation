@@ -1,0 +1,13 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: >
+  This template allocates an internet gateway for use with a VPC.
+Resources:
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags: 
+        - Key: "Name"
+          Value: !Ref AWS::StackName
+Outputs:
+  SubnetId:
+    Value: !Ref InternetGateway
