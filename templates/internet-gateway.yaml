@@ -34,3 +34,5 @@ Resources:
 Outputs:
   InternetGatewayId:
     Value: !Ref InternetGateway
+  VPCGatewayAttachment:
+    Value: !Ref VPCGatewayAttachment
