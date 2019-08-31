@@ -28,5 +28,5 @@ Resources:
           Value: !Ref AWS::StackName
       VpcId: !Ref VpcId
 Outputs:
-  SubnetId:
+  RouteTableId:
     Value: !Ref RouteTable

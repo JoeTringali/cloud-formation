@@ -1,69 +1,100 @@
 AWSTemplateFormatVersion: 2010-09-09
 Description: >
-  This template specifies a VPC with a public and a private subnet
-  associated with each of two availability zones.
+  This template specifies a VPC with subnets in 2 availability zones.
 Metadata:
   AWS::CloudFormation::Interface:
     ParameterGroups:
       - Label:
-          default: Stack Configuration
-        Parameters:
-          - pTemplateBucket
-          - pTemplateBucketPrefix
-      - Label:
           default: VPC Configuration
         Parameters:
-          - pCidrBlock
-          - pEnableDnsHostnames
-          - pEnableDnsSupport
-          - pInstanceTenancy
-          - pVpcNameTag
+          - CidrBlock
+          - EnableDnsHostnames
+          - EnableDnsSupport
+          - InstanceTenancy
       - Label:
-          default: Private Subnet 1 Configuration
+          default: Private 1 Subnet Configuration
         Parameters:
-          - pPrivateSubnet1CidrBlock
+          - Private1SubnetAssignIpv6AddressOnCreation
+          - Private1SubnetCidrBlock
+          - Private1SubnetIpv6CidrBlock
+          - Private1SubnetMapPublicIpOnLaunch
       - Label:
-          default: Private Subnet 2 Configuration
+          default: Private 2 Subnet Configuration
         Parameters:
-          - pPrivateSubnet2CidrBlock
+          - Private2SubnetAssignIpv6AddressOnCreation
+          - Private2SubnetCidrBlock
+          - Private2SubnetIpv6CidrBlock
+          - Private2SubnetMapPublicIpOnLaunch
       - Label:
-          default: Public Subnet 1 Configuration
+          default: Public 1 Subnet Configuration
         Parameters:
-          - pPublicSubnet1CidrBlock
+          - Public1SubnetAssignIpv6AddressOnCreation
+          - Public1SubnetCidrBlock
+          - Public1SubnetIpv6CidrBlock
+          - Public1SubnetMapPublicIpOnLaunch
       - Label:
-          default: Public Subnet 2 Configuration
+          default: Public 2 Subnet Configuration
         Parameters:
-          - pPublicSubnet2CidrBlock
+          - Public2SubnetAssignIpv6AddressOnCreation
+          - Public2SubnetCidrBlock
+          - Public2SubnetIpv6CidrBlock
+          - Public2SubnetMapPublicIpOnLaunch
     ParameterLabels:
-      pCidrBlock:
+      CidrBlock:
         default: IPv4 CIDR Block
-      pEnableDnsHostnames:
+      EnableDnsHostnames:
         default: Enable DNS Hostnames
-      pEnableDnsSupport:
+      EnableDnsSupport:
         default: Enable DNS Support
-      pInstanceTenancy:
+      InstanceTenancy:
         default: Instance Tenancy
-      pPrivateSubnet1CidrBlock:
+      Private1SubnetAssignIpv6AddressOnCreation:
+        default: Assign Ipv6 Address on Creation
+      Private1SubnetAvailabilityZone:
+        default: Availability Zone
+      Private1SubnetCidrBlock:
         default: IPv4 CIDR Block
-      pPrivateSubnet2CidrBlock:
+      Private1SubnetIpcv6CidrBlock:
+        default: IPv6 CIDR Block
+      Private1SubnetMapPublicIpOnLaunch:
+        default: Map Public IP on Launch
+      Private2SubnetAssignIpv6AddressOnCreation:
+        default: Assign Ipv6 Address on Creation
+      Private2SubnetAvailabilityZone:
+        default: Availability Zone
+      Private2SubnetCidrBlock:
         default: IPv4 CIDR Block
-      pPublicSubnet1CidrBlock:
+      Private2SubnetIpcv6CidrBlock:
+        default: IPv6 CIDR Block
+      Private2SubnetMapPublicIpOnLaunch:
+        default: Map Public IP on Launch
+      Public1SubnetAssignIpv6AddressOnCreation:
+        default: Assign Ipv6 Address on Creation
+      Public1SubnetAvailabilityZone:
+        default: Availability Zone
+      Public1SubnetCidrBlock:
         default: IPv4 CIDR Block
-      pPublicSubnet2CidrBlock:
+      Public1SubnetIpcv6CidrBlock:
+        default: IPv6 CIDR Block
+      Public1SubnetMapPublicIpOnLaunch:
+        default: Map Public IP on Launch
+      Public2SubnetAssignIpv6AddressOnCreation:
+        default: Assign Ipv6 Address on Creation
+      Public2SubnetAvailabilityZone:
+        default: Availability Zone
+      Public2SubnetCidrBlock:
         default: IPv4 CIDR Block
-      pTemplateBucket:
-        default: Template Bucket
-      pTemplateBucketPrefix:
-        default: Template Bucket Prefix
-      pVpcNameTag:
-        default: VPC Name Tag
+      Public2SubnetIpcv6CidrBlock:
+        default: IPv6 CIDR Block
+      Public2SubnetMapPublicIpOnLaunch:
+        default: Map Public IP on Launch
 Parameters:
-  pCidrBlock:
+  CidrBlock:
     Type: String
     AllowedPattern: '((\d{1,3})\.){3}\d{1,3}/\d{1,2}'
     Default: 10.0.0.0/16
     Description: The primary IPv4 CIDR block for the VPC.
-  pEnableDnsHostnames:
+  EnableDnsHostnames:
     Type: String
     AllowedValues:
       - false
@@ -72,7 +103,7 @@ Parameters:
     Description: >
       Indicates whether the instances launched in the VPC get DNS 
       hostnames.
-  pEnableDnsSupport:
+  EnableDnsSupport:
     Type: String
     AllowedValues:
       - false
@@ -80,7 +111,7 @@ Parameters:
     Default: true
     Description: >
       Indicates whether the DNS resolution is supported for the VPC.
-  pInstanceTenancy:
+  InstanceTenancy:
     Type: String
     AllowedValues:
       - dedicated
@@ -89,88 +120,243 @@ Parameters:
     Description: >
       The allowed tenancy of instances launched into the VPC.
     Default: default
-  pPrivateSubnet1CidrBlock:
+  Private1SubnetAssignIpv6AddressOnCreation:
+    Type: String
+    AllowedValues:
+      - false
+      - true
+    Default: false
+    Description: >
+      Indicates whether a network interface created in this subnet 
+      receives an IPv6 address.
+  Private1SubnetCidrBlock:
     Type: String
     AllowedPattern: '((\d{1,3})\.){3}\d{1,3}/\d{1,2}'
     Default: 10.0.0.0/24
     Description: The IPv4 CIDR block assigned to the subnet.
-  pPrivateSubnet2CidrBlock:
+  Private1SubnetIpv6CidrBlock:
+    Type: String
+    Description: The IPv6 CIDR block assigned to the subnet.
+  Private1SubnetMapPublicIpOnLaunch:
+    Type: String
+    AllowedValues:
+      - false
+      - true
+    Default: false
+    Description: >
+      Indicates whether instances launched in this subnet receive a 
+      public IPv4 address. 
+  Private2SubnetAssignIpv6AddressOnCreation:
+    Type: String
+    AllowedValues:
+      - false
+      - true
+    Default: false
+    Description: >
+      Indicates whether a network interface created in this subnet 
+      receives an IPv6 address.
+  Private2SubnetCidrBlock:
     Type: String
     AllowedPattern: '((\d{1,3})\.){3}\d{1,3}/\d{1,2}'
     Default: 10.0.64.0/24
     Description: The IPv4 CIDR block assigned to the subnet.
-  pPublicSubnet1CidrBlock:
+  Private2SubnetIpv6CidrBlock:
+    Type: String
+    Description: The IPv6 CIDR block assigned to the subnet.
+  Private2SubnetMapPublicIpOnLaunch:
+    Type: String
+    AllowedValues:
+      - false
+      - true
+    Default: false
+    Description: >
+      Indicates whether instances launched in this subnet receive a 
+      public IPv4 address. 
+  Public1SubnetAssignIpv6AddressOnCreation:
+    Type: String
+    AllowedValues:
+      - false
+      - true
+    Default: false
+    Description: >
+      Indicates whether a network interface created in this subnet 
+      receives an IPv6 address.
+  Public1SubnetCidrBlock:
     Type: String
     AllowedPattern: '((\d{1,3})\.){3}\d{1,3}/\d{1,2}'
     Default: 10.0.128.0/24
     Description: The IPv4 CIDR block assigned to the subnet.
-  pPublicSubnet2CidrBlock:
+  Public1SubnetIpv6CidrBlock:
+    Type: String
+    Description: The IPv6 CIDR block assigned to the subnet.
+  Public1SubnetMapPublicIpOnLaunch:
+    Type: String
+    AllowedValues:
+      - false
+      - true
+    Default: false
+    Description: >
+      Indicates whether instances launched in this subnet receive a 
+      public IPv4 address. 
+  Public2SubnetAssignIpv6AddressOnCreation:
+    Type: String
+    AllowedValues:
+      - false
+      - true
+    Default: false
+    Description: >
+      Indicates whether a network interface created in this subnet 
+      receives an IPv6 address.
+  Public2SubnetCidrBlock:
     Type: String
     AllowedPattern: '((\d{1,3})\.){3}\d{1,3}/\d{1,2}'
     Default: 10.0.192.0/24
     Description: The IPv4 CIDR block assigned to the subnet.
-  pTemplateBucket:
+  Public2SubnetIpv6CidrBlock:
     Type: String
-    Default: aws-tringali-joe
-    Description: >
-      The S3 bucket from which to fetch the templates used by this stack.
-  pTemplateBucketPrefix:
+    Description: The IPv6 CIDR block assigned to the subnet.
+  Public2SubnetMapPublicIpOnLaunch:
     Type: String
-    Default: cloud-formation/templates
+    AllowedValues:
+      - false
+      - true
+    Default: false
     Description: >
-      The folder (bucket prefix) from which to fetch the templates used by this stack.
-  pVpcNameTag:
-    Type: String
-    Description: >
-      A tag with a key of 'Name' and a value that you specify.
+      Indicates whether instances launched in this subnet receive a 
+      public IPv4 address. 
+Conditions:
+  Private1SubnetShouldAssignIpv6AddressOnCreation: 
+    !Equals 
+      - !Ref Private1SubnetAssignIpv6AddressOnCreation
+      - true
+  Private2SubnetShouldAssignIpv6AddressOnCreation: 
+    !Equals 
+      - !Ref Private2SubnetAssignIpv6AddressOnCreation
+      - true
+  Public1SubnetShouldAssignIpv6AddressOnCreation: 
+    !Equals 
+      - !Ref Public1SubnetAssignIpv6AddressOnCreation
+      - true
+  Public2SubnetShouldAssignIpv6AddressOnCreation: 
+    !Equals 
+      - !Ref Public2SubnetAssignIpv6AddressOnCreation
+      - true
 Resources:
   VPC:
-    Type: AWS::CloudFormation::Stack
+    Type: AWS::EC2::VPC
+    Properties: 
+      CidrBlock: !Ref CidrBlock
+      EnableDnsHostnames: !Ref EnableDnsHostnames
+      EnableDnsSupport: !Ref EnableDnsSupport
+      InstanceTenancy: !Ref InstanceTenancy
+      Tags: 
+        - Key: "Name"
+          Value: !Ref AWS::StackName
+  Private1Subnet:
+    Type: AWS::EC2::Subnet
     Properties:
-      Parameters:
-        pCidrBlock: !Ref pCidrBlock
-        pEnableDnsHostnames: !Ref pEnableDnsHostnames
-        pEnableDnsSupport: !Ref pEnableDnsSupport
-        pInstanceTenancy: !Ref pInstanceTenancy
-        pNameTag: !Ref pVpcNameTag
-      TemplateURL: !Sub "https://${pTemplateBucket}.s3.amazonaws.com/${pTemplateBucketPrefix}/vpc.yaml"
-  PrivateSubnet1:
-    Type: AWS::CloudFormation::Stack
+      AssignIpv6AddressOnCreation:
+        !If
+          - Private1SubnetShouldAssignIpv6AddressOnCreation
+          - !Ref Private1SubnetAssignIpv6AddressOnCreation
+          - !Ref AWS::NoValue
+      AvailabilityZone: !Select [ 0, !GetAZs ]
+      CidrBlock: !Ref Private1SubnetCidrBlock
+      Ipv6CidrBlock: 
+        !If
+          - Private1SubnetShouldAssignIpv6AddressOnCreation
+          - !Ref Private1SubnetIpv6CidrBlock
+          - !Ref AWS::NoValue
+      MapPublicIpOnLaunch: 
+        !If
+          - Private1SubnetShouldAssignIpv6AddressOnCreation
+          - !Ref AWS::NoValue
+          - !Ref Private1SubnetMapPublicIpOnLaunch
+      Tags: 
+        - Key: "Name"
+          Value: !Sub "${AWS::StackName}-private-1-subnet"
+      VpcId: !Ref VPC
+  Private2Subnet:
+    Type: AWS::EC2::Subnet
     Properties:
-      Parameters:
-        pAvailabilityZone: !Select [ 0, !GetAZs ]
-        pCidrBlock: !Ref pPrivateSubnet1CidrBlock
-        pIpv6CidrBlock: AWS::NoValue
-        pNameTag: !Sub "${pVpcNameTag}-private-1"
-        pVpcId: !GetAtt VPC.Outputs.VpcId
-      TemplateURL: !Sub "https://${pTemplateBucket}.s3.amazonaws.com/${pTemplateBucketPrefix}/subnet.yaml"
-  PrivateSubnet2:
-    Type: AWS::CloudFormation::Stack
+      AssignIpv6AddressOnCreation:
+        !If
+          - Private2SubnetShouldAssignIpv6AddressOnCreation
+          - !Ref Private2SubnetAssignIpv6AddressOnCreation
+          - !Ref AWS::NoValue
+      AvailabilityZone: !Select [ 1, !GetAZs ]
+      CidrBlock: !Ref Private2SubnetCidrBlock
+      Ipv6CidrBlock: 
+        !If
+          - Private2SubnetShouldAssignIpv6AddressOnCreation
+          - !Ref Private2SubnetIpv6CidrBlock
+          - !Ref AWS::NoValue
+      MapPublicIpOnLaunch: 
+        !If
+          - Private2SubnetShouldAssignIpv6AddressOnCreation
+          - !Ref AWS::NoValue
+          - !Ref Private2SubnetMapPublicIpOnLaunch
+      Tags: 
+        - Key: "Name"
+          Value: !Sub "${AWS::StackName}-private-2-subnet"
+      VpcId: !Ref VPC
+  Public1Subnet:
+    Type: AWS::EC2::Subnet
     Properties:
-      Parameters:
-        pAvailabilityZone: !Select [ 1, !GetAZs ]
-        pCidrBlock: !Ref pPrivateSubnet2CidrBlock
-        pIpv6CidrBlock: AWS::NoValue
-        pNameTag: !Sub "${pVpcNameTag}-private-2"
-        pVpcId: !GetAtt VPC.Outputs.VpcId
-      TemplateURL: !Sub "https://${pTemplateBucket}.s3.amazonaws.com/${pTemplateBucketPrefix}/subnet.yaml"
-  PublicSubnet1:
-    Type: AWS::CloudFormation::Stack
+      AssignIpv6AddressOnCreation:
+        !If
+          - Public1SubnetShouldAssignIpv6AddressOnCreation
+          - !Ref Public1SubnetAssignIpv6AddressOnCreation
+          - !Ref AWS::NoValue
+      AvailabilityZone: !Select [ 0, !GetAZs ]
+      CidrBlock: !Ref Public1SubnetCidrBlock
+      Ipv6CidrBlock: 
+        !If
+          - Public1SubnetShouldAssignIpv6AddressOnCreation
+          - !Ref Public1SubnetIpv6CidrBlock
+          - !Ref AWS::NoValue
+      MapPublicIpOnLaunch: 
+        !If
+          - Public1SubnetShouldAssignIpv6AddressOnCreation
+          - !Ref AWS::NoValue
+          - !Ref Public1SubnetMapPublicIpOnLaunch
+      Tags: 
+        - Key: "Name"
+          Value: !Sub "${AWS::StackName}-public-1-subnet"
+      VpcId: !Ref VPC
+  Public2Subnet:
+    Type: AWS::EC2::Subnet
     Properties:
-      Parameters:
-        pAvailabilityZone: !Select [ 0, !GetAZs ]
-        pCidrBlock: !Ref pPublicSubnet1CidrBlock
-        pIpv6CidrBlock: AWS::NoValue
-        pNameTag: !Sub "${pVpcNameTag}-public-1"
-        pVpcId: !GetAtt VPC.Outputs.VpcId
-      TemplateURL: !Sub "https://${pTemplateBucket}.s3.amazonaws.com/${pTemplateBucketPrefix}/subnet.yaml"
-  PublicSubnet2:
-    Type: AWS::CloudFormation::Stack
-    Properties:
-      Parameters:
-        pAvailabilityZone: !Select [ 1, !GetAZs ]
-        pCidrBlock: !Ref pPublicSubnet2CidrBlock
-        pIpv6CidrBlock: AWS::NoValue
-        pNameTag: !Sub "${pVpcNameTag}-public-2"
-        pVpcId: !GetAtt VPC.Outputs.VpcId
-      TemplateURL: !Sub "https://${pTemplateBucket}.s3.amazonaws.com/${pTemplateBucketPrefix}/subnet.yaml"
+      AssignIpv6AddressOnCreation:
+        !If
+          - Public2SubnetShouldAssignIpv6AddressOnCreation
+          - !Ref Public2SubnetAssignIpv6AddressOnCreation
+          - !Ref AWS::NoValue
+      AvailabilityZone: !Select [ 1, !GetAZs ]
+      CidrBlock: !Ref Public2SubnetCidrBlock
+      Ipv6CidrBlock: 
+        !If
+          - Public2SubnetShouldAssignIpv6AddressOnCreation
+          - !Ref Public2SubnetIpv6CidrBlock
+          - !Ref AWS::NoValue
+      MapPublicIpOnLaunch: 
+        !If
+          - Public2SubnetShouldAssignIpv6AddressOnCreation
+          - !Ref AWS::NoValue
+          - !Ref Public2SubnetMapPublicIpOnLaunch
+      Tags: 
+        - Key: "Name"
+          Value: !Sub "${AWS::StackName}-public-2-subnet"
+      VpcId: !Ref VPC
+##################
+Outputs:
+  Subnets:
+    Value: 
+      !Join 
+        - ","
+        - - !Ref Private1Subnet
+          - !Ref Private2Subnet
+          - !Ref Public1Subnet
+          - !Ref Public2Subnet
+  VpcId:
+    Value: !Ref VPC
