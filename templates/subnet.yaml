@@ -7,23 +7,35 @@ Metadata:
       - Label:
           default: Subnet Configuration
         Parameters:
+          - AssignIpv6AddressOnCreation
           - AvailabilityZone
           - CidrBlock
+          - Ipv6CidrBlock
           - MapPublicIpOnLaunch
-          - NameTag
           - VpcId
     ParameterLabels:
+      AssignIpv6AddressOnCreation:
+        default: Assign Ipv6 Address on Creation
       AvailabilityZone:
         default: Availability Zone
       CidrBlock:
         default: IPv4 CIDR Block
+      Ipcv6CidrBlock:
+        default: IPv6 CIDR Block
       MapPublicIpOnLaunch:
         default: Map Public IP on Launch
-      NameTag:
-        default: Name Tag
       VpcId:
         default: VPC ID
 Parameters:
+  AssignIpv6AddressOnCreation:
+    Type: String
+    AllowedValues:
+      - false
+      - true
+    Default: false
+    Description: >
+      Indicates whether a network interface created in this subnet 
+      receives an IPv6 address.
   AvailabilityZone:
     Type: String
     Description: >
@@ -32,6 +44,9 @@ Parameters:
     Type: String
     AllowedPattern: '((\d{1,3})\.){3}\d{1,3}/\d{1,2}'
     Description: The IPv4 CIDR block assigned to the subnet.
+  Ipv6CidrBlock:
+    Type: String
+    Description: The IPv6 CIDR block assigned to the subnet.
   MapPublicIpOnLaunch:
     Type: String
     AllowedValues:
@@ -39,11 +54,8 @@ Parameters:
       - true
     Default: false
     Description: >
-      Indicates whether instances launched in this subnet receive a public IPv4 address. 
-  NameTag:
-    Type: String
-    Description: >
-      A tag with a key of 'Name' and a value that you specify.
+      Indicates whether instances launched in this subnet receive a 
+      public IPv4 address. 
   VpcId:
     Type: AWS::EC2::VPC::Id
     ConstraintDescription: >
@@ -52,20 +64,34 @@ Parameters:
       The ID of the VPC the subnet is in.
     MinLength: 1
 Conditions:
-  HasNameTag:  !Not [ !Equals [ !Ref NameTag, "" ] ]
+  ShouldAssignIpv6AddressOnCreation: 
+    !Equals 
+      - !Ref AssignIpv6AddressOnCreation
+      - true
 Resources:
   Subnet:
     Type: AWS::EC2::Subnet
-    Properties: 
+    Properties:
+      AssignIpv6AddressOnCreation:
+        !If
+          - ShouldAssignIpv6AddressOnCreation
+          - !Ref AssignIpv6AddressOnCreation
+          - !Ref AWS::NoValue
       AvailabilityZone: !Ref AvailabilityZone
       CidrBlock: !Ref CidrBlock
-      MapPublicIpOnLaunch: !Ref MapPublicIpOnLaunch
+      Ipv6CidrBlock: 
+        !If
+          - ShouldAssignIpv6AddressOnCreation
+          - !Ref Ipv6CidrBlock
+          - !Ref AWS::NoValue
+      MapPublicIpOnLaunch: 
+        !If
+          - ShouldAssignIpv6AddressOnCreation
+          - !Ref AWS::NoValue
+          - !Ref MapPublicIpOnLaunch
       Tags: 
-        !If 
-          - HasNameTag
-          - Key: "Name"
-            Value: !Ref NameTag
-          - []
+        - Key: "Name"
+          Value: !Ref AWS::StackName
       VpcId: !Ref VpcId
 Outputs:
   SubnetId:

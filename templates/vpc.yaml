@@ -13,7 +13,6 @@ Metadata:
           - EnableDnsHostnames
           - EnableDnsSupport
           - InstanceTenancy
-          - NameTag
     ParameterLabels:
       CidrBlock:
         default: IPv4 CIDR Block
@@ -23,10 +22,6 @@ Metadata:
         default: Enable DNS Support
       InstanceTenancy:
         default: Instance Tenancy
-      NameTag:
-        default: Name Tag
-Conditions:
-  HasNameTag:  !Not [ !Equals [ !Ref NameTag, "" ] ]
 Parameters:
   CidrBlock:
     Type: String
@@ -59,10 +54,6 @@ Parameters:
     Description: >
       The allowed tenancy of instances launched into the VPC.
     Default: default
-  NameTag:
-    Type: String
-    Description: >
-      A tag with a key of 'Name' and a value that you specify.
 Resources:
   VPC:
     Type: AWS::EC2::VPC
@@ -72,11 +63,8 @@ Resources:
       EnableDnsSupport: !Ref EnableDnsSupport
       InstanceTenancy: !Ref InstanceTenancy
       Tags: 
-        !If 
-          - HasNameTag
-          - Key: "Name"
-            Value: !Ref NameTag
-          - []
+        - Key: "Name"
+          Value: !Ref AWS::StackName
 Outputs:
   VpcId:
     Value: !Ref VPC
