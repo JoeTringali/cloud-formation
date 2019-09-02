@@ -1,0 +1,48 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: >
+  This template specifies a route with an internet gateway target in a 
+  route table within a VPC.
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: Route with Internet Gateway Target Configuration
+        Parameters:
+          - DestinationCidrBlock
+          - InternetGatewayId
+          - RouteTableId
+    ParameterLabels:
+      DestinationCidrBlock:
+        default: Destination IPv4 CIDR Block
+      InternetGatewayId:
+        default: Internet Gateway ID
+      RouteTableId:
+        default: Route Table ID
+Parameters:
+  DestinationCidrBlock:
+    Type: String
+    AllowedPattern: '((\d{1,3})\.){3}\d{1,3}/\d{1,2}'
+    Default: 0.0.0.0/0
+    Description: The IPv4 CIDR block used for the destination match.
+  InternetGatewayId:
+    Type: String
+    ConstraintDescription: >
+      Internet Gateway ID is required.
+    Description: >
+      The ID of the internet gateway attached to your VPC.
+    MinLength: 1
+  RouteTableId:
+    Type: String
+    ConstraintDescription: >
+      Route Table ID is required.
+    MinLength: 1
+Resources:
+  Route:
+    Type: AWS::EC2::Route
+    Properties:
+      DestinationCidrBlock: !Ref DestinationCidrBlock
+      GatewayId: !Ref InternetGatewayId
+      RouteTableId: !Ref RouteTableId
+Outputs:
+  RouteId:
+    Value: !Ref Route
