@@ -379,9 +379,35 @@ Resources:
         - Key: "Name"
           Value: !Sub "${AWS::StackName}-public-2-subnet"
       VpcId: !Ref VPC
+  Private1SubnetRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PrivateRouteTable
+      SubnetId: !Ref Private1Subnet
+  Private2SubnetRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PrivateRouteTable
+      SubnetId: !Ref Private2Subnet
+  Public1SubnetRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      SubnetId: !Ref Public1Subnet
+  Public2SubnetRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      SubnetId: !Ref Public2Subnet
 Outputs:
   InternetGatewayId:
     Value: !Ref InternetGateway
+#  Routes:
+#    Value:
+#      !Join 
+#        - ","
+#        - - !Ref PrivateRoute
+#          - !Ref PublicRoute
   RouteTables:
     Value:
       !Join 
@@ -396,6 +422,14 @@ Outputs:
           - !Ref Private2Subnet
           - !Ref Public1Subnet
           - !Ref Public2Subnet
+  SubnetRouteTableAssociations:
+    Value:
+      !Join 
+        - ","
+        - - !Ref Private1SubnetRouteTableAssociation
+          - !Ref Private2SubnetRouteTableAssociation
+          - !Ref Public1SubnetRouteTableAssociation
+          - !Ref Public2SubnetRouteTableAssociation
   VPCGatewayAttachmentId:
     Value: !Ref VPCGatewayAttachment
   VpcId:
