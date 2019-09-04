@@ -406,11 +406,11 @@ Resources:
     Properties:
       RouteTableId: !Ref PublicRouteTable
       SubnetId: !Ref Public2Subnet
-  EIP1:
+  Public1NatGatewayEIP:
     Type: AWS::EC2::EIP
     Properties:
       Domain: vpc
-  EIP2:
+  Public2NatGatewayEIP:
     Type: AWS::EC2::EIP
     Properties:
       Domain: vpc
@@ -419,7 +419,7 @@ Resources:
     Properties:
       AllocationId:
         !GetAtt
-          - EIP1
+          - Public1NatGatewayEIP
           - AllocationId
       SubnetId: !Ref Public1Subnet
       Tags: 
@@ -430,7 +430,7 @@ Resources:
     Properties:
       AllocationId:
         !GetAtt
-          - EIP2
+          - Public2NatGatewayEIP
           - AllocationId
       SubnetId: !Ref Public2Subnet
       Tags: 
@@ -453,8 +453,8 @@ Outputs:
     Value:
       !Join 
         - ","
-        - - !Ref EIP1
-          - !Ref EIP2
+        - - !Ref Public1NatGatewayEIP
+          - !Ref Public2NatGatewayEIP
   InternetGatewayId:
     Value: !Ref InternetGateway
   NatGateways:
