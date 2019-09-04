@@ -263,12 +263,19 @@ Resources:
     Properties:
       InternetGatewayId: !Ref InternetGateway
       VpcId: !Ref VPC
-  PrivateRouteTable:
+  Private1RouteTable:
     Type: AWS::EC2::RouteTable
     Properties:
       Tags: 
         - Key: "Name"
-          Value: !Sub "${AWS::StackName}-private-route-table"
+          Value: !Sub "${AWS::StackName}-private-1-route-table"
+      VpcId: !Ref VPC
+  Private2RouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      Tags: 
+        - Key: "Name"
+          Value: !Sub "${AWS::StackName}-private-2-route-table"
       VpcId: !Ref VPC
   PublicRouteTable:
     Type: AWS::EC2::RouteTable
@@ -382,12 +389,12 @@ Resources:
   Private1SubnetRouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
-      RouteTableId: !Ref PrivateRouteTable
+      RouteTableId: !Ref Private1RouteTable
       SubnetId: !Ref Private1Subnet
   Private2SubnetRouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
-      RouteTableId: !Ref PrivateRouteTable
+      RouteTableId: !Ref Private2RouteTable
       SubnetId: !Ref Private2Subnet
   Public1SubnetRouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
@@ -399,20 +406,76 @@ Resources:
     Properties:
       RouteTableId: !Ref PublicRouteTable
       SubnetId: !Ref Public2Subnet
+  EIP1:
+    Type: AWS::EC2::EIP
+    Properties:
+      Domain: vpc
+  EIP2:
+    Type: AWS::EC2::EIP
+    Properties:
+      Domain: vpc
+  NatGateway1:
+    Type: AWS::EC2::NatGateway
+    Properties:
+      AllocationId:
+        !GetAtt
+          - EIP1
+          - AllocationId
+      SubnetId: !Ref Public1Subnet
+      Tags: 
+        - Key: "Name"
+          Value: !Sub "${AWS::StackName}-public-1-nat-gateway"
+  NatGateway2:
+    Type: AWS::EC2::NatGateway
+    Properties:
+      AllocationId:
+        !GetAtt
+          - EIP2
+          - AllocationId
+      SubnetId: !Ref Public2Subnet
+      Tags: 
+        - Key: "Name"
+          Value: !Sub "${AWS::StackName}-public-2-nat-gateway"
+  Private1Route:
+    Type: AWS::EC2::Route
+    Properties:
+      DestinationCidrBlock: 0.0.0.0/0
+      NatGatewayId: !Ref NatGateway1
+      RouteTableId: !Ref Private1RouteTable
+  Private2Route:
+    Type: AWS::EC2::Route
+    Properties:
+      DestinationCidrBlock: 0.0.0.0/0
+      NatGatewayId: !Ref NatGateway2
+      RouteTableId: !Ref Private2RouteTable
 Outputs:
+  EIPs:
+    Value:
+      !Join 
+        - ","
+        - - !Ref EIP1
+          - !Ref EIP2
   InternetGatewayId:
     Value: !Ref InternetGateway
-#  Routes:
-#    Value:
-#      !Join 
-#        - ","
-#        - - !Ref PrivateRoute
-#          - !Ref PublicRoute
+  NatGateways:
+    Value:
+      !Join 
+        - ","
+        - - !Ref NatGateway1
+          - !Ref NatGateway2
+  Routes:
+    Value:
+      !Join 
+        - ","
+        - - !Ref Private1Route
+          - !Ref Private2Route
+          - !Ref PublicRoute
   RouteTables:
     Value:
       !Join 
         - ","
-        - - !Ref PrivateRouteTable
+        - - !Ref Private1RouteTable
+          - !Ref Private2RouteTable
           - !Ref PublicRouteTable
   Subnets:
     Value: 

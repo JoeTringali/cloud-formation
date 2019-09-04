@@ -1,0 +1,43 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: >
+  This template specifies a network address translation (NAT) gateway 
+  in the specified public subnet.
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: NAT Gateway Configuration
+        Parameters:
+          - SubnetId
+    ParameterLabels:
+      SubnetId:
+        default: Subnet ID
+Parameters:
+  SubnetId:
+    Type: String
+    ConstraintDescription: >
+      Subnet ID is required.
+    Description: >
+      The ID of the public subnet in which to create the NAT gateway.
+    MinLength: 1
+Resources:
+  EIP:
+    Type: AWS::EC2::EIP
+    Properties:
+      Domain: vpc
+  NatGateway:
+    Type: AWS::EC2::NatGateway
+    Properties:
+      AllocationId:
+        !GetAtt
+          - EIP
+          - AllocationId
+      SubnetId: !Ref SubnetId
+      Tags: 
+        - Key: "Name"
+          Value: !Ref AWS::StackName
+Outputs:
+  EIP:
+    Value: !Ref EIP
+  NatGatewayId:
+    Value: !Ref NatGateway
