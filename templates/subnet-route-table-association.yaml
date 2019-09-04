@@ -1,0 +1,40 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: >
+  This template associates a subnet with a route table.
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: Subnet Route Table Association Configuration
+        Parameters:
+          - RouteTableId
+          - SubnetId
+    ParameterLabels:
+      RouteTableId:
+        default: Route Table ID
+      SubnetId:
+        default: Subnet ID
+Parameters:
+  RouteTableId:
+    Type: String
+    ConstraintDescription: >
+      Route Table ID is required.
+    Description: >
+      The ID of the route table.
+    MinLength: 1
+  SubnetId:
+    Type: String
+    ConstraintDescription: >
+      Subnet ID is required.
+    Description: >
+      The ID of the subnet.
+    MinLength: 1
+Resources:
+  SubnetRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref RouteTableId
+      SubnetId: !Ref SubnetId
+Outputs:
+  RouteId:
+    Value: !Ref SubnetRouteTableAssociation
