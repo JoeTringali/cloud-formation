@@ -1,0 +1,61 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: >
+  This template specifies an Application Load Balancer or a Network Load
+  Balancer.
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: Load Balancer Configuration
+        Parameters:
+          - IpAddressType
+          - SecurityGroups
+          - Subnets
+          - Type
+    ParameterLabels:
+      IpAddressType:
+        default: IP Address Type
+      SecurityGroups:
+        default: Security Groups
+      Subnets:
+        default: Subnets
+      Type:
+        default: Type
+Parameters:
+  IpAddressType:
+    Type: String
+    AllowedValues:
+      - dualstack
+      - ipv4
+    Default: ipv4
+    Description: 
+      The IP address type.
+  SecurityGroups:
+    Type: List<AWS::EC2::SecurityGroup::Id>
+    Description:
+      The IDs of the security groups for the load balancer.
+  Subnets:
+    Type: List<AWS::EC2::Subnet::Id>
+    Description:
+      The IDs of the subnets.
+  Type:
+    Type: String
+    AllowedValues:
+      - application
+      - Network
+    Default: application
+    Description: 
+      The type of load balancer.
+Resources:
+  LoadBalancer:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties: 
+      IpAddressType: !Ref IpAddressType
+      SecurityGroups: !Ref SecurityGroups
+      Subnets: !Ref Subnets
+      Tags: 
+        - Key: "Name"
+          Value: !Ref AWS::StackName
+Outputs:
+  LoadBalancerId:
+    Value: !Ref LoadBalancer
