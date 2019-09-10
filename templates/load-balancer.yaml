@@ -42,7 +42,7 @@ Parameters:
     Type: String
     AllowedValues:
       - application
-      - Network
+      - network
     Default: application
     Description: 
       The type of load balancer.
@@ -56,6 +56,7 @@ Resources:
       Tags: 
         - Key: "Name"
           Value: !Ref AWS::StackName
+      Type: !Ref Type
 Outputs:
   LoadBalancerId:
     Value: !Ref LoadBalancer
